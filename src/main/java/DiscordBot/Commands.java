@@ -8,20 +8,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Commands extends ListenerAdapter {
-    ArrayList<String> studylinks = new ArrayList<>();
     ArrayList<String> subjects = new ArrayList<>();
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void onMessageReceived(@NotNull MessageReceivedEvent event){
         String[] args = event.getMessage().getContentRaw().split(" ");
 
-
-            if (Moderation.badWordDetection(args)) {
+        //BAD WORD DETECTION
+        if (Moderation.badWordDetection(args)) {
                 event.getChannel().sendTyping().queue();
                 event.getChannel().sendMessage("Please, watch your language!").queue();
-            }
+        }
 
         //PING
         if(args[0].equalsIgnoreCase(Main.prefix + "ping")) {
@@ -37,18 +35,16 @@ public class Commands extends ListenerAdapter {
         // COMMAND LIST
         if (args[0].equalsIgnoreCase(Main.prefix + "commands")){
             event.getChannel().sendTyping().queue();
-            event.getChannel().sendMessage("Commands:\n" +
-                    " `prefix` - displays current prefix \n" +
-                    " `commands` - displays all commands \n" +
-                    " `config` - settings \n" +
-                            " ping - command for testing latency \n" +
-                            " poll - command for creating a yes or no poll").queue();
+            event.getChannel().sendMessage("""
+                    Commands:
+                     `prefix` - displays current prefix\s
+                     `commands` - displays all commands\s
+                     `config` - settings\s
+                     ping - command for testing latency\s
+                     poll - command for creating a yes or no poll""").queue();
         }
         // CONFIGURATION SETTINGS
         if (args[0].equalsIgnoreCase(Main.prefix + "config")){
-            SlashCommands.data.setName("configuration");
-            SlashCommands.data.setDescription("configuration settings");
-
             //PREFIX
             if (args.length == 2) {
                 if (args[1].equalsIgnoreCase("prefix")){
@@ -59,20 +55,15 @@ public class Commands extends ListenerAdapter {
             }
             if (args.length == 4) {
                 if (args[1].equalsIgnoreCase("prefix")){
-                    if (args[3].equalsIgnoreCase("set")){
+                    if (args[2].equalsIgnoreCase("set")){
                         event.getChannel().sendTyping().queue();
-                        Main.prefix = args[4];
+                        Main.prefix = args[3];
                         event.getChannel().sendMessage("New global prefix was set.").queue();
                     }
                 }
             }else if (args.length == 1){
                 event.getChannel().sendTyping().queue();
                 event.getChannel().sendMessage("Configuration commands: \n`config prefix` - prefix changing").queue();
-            }
-
-            if(args[1].equalsIgnoreCase(Main.prefix + "studylinks")){
-                event.getChannel().sendTyping().queue();
-                event.getChannel().sendMessage("").queue();
             }
         }
 
@@ -104,8 +95,8 @@ public class Commands extends ListenerAdapter {
                        event.getChannel().sendMessage("No subjects were set. Type-in `" + Main.prefix + "subject add` to add one!").queue();
                    }
                    else {
-                       for (int i = 0; i < subjects.size(); i++) {
-                           event.getChannel().sendMessage(subjects.get(i)).queue();
+                       for (String subject : subjects) {
+                           event.getChannel().sendMessage(subject).queue();
                        }
                    }
                }
@@ -114,16 +105,16 @@ public class Commands extends ListenerAdapter {
 
         // second try poll
         if (args[0].equalsIgnoreCase(Main.prefix + "poll")) {
-            String ping = "";
-            String pollMessage = "";
+            String ping;
+            String pollMessage;
             // Ping @everyone
             if(args[1].equalsIgnoreCase("pe")){
                 ping = "@everyone ";
                 //YesOrNo Poll
                 if(args[2].equalsIgnoreCase("yn")){
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuilder buffer = new StringBuilder();
                     for(int i = 3; i < args.length; i++) {
-                        buffer.append(args[i] + " ");
+                        buffer.append(args[i]).append(" ");
                     }
                     event.getChannel().sendTyping().queue();
                     pollMessage = buffer.toString();
@@ -138,9 +129,9 @@ public class Commands extends ListenerAdapter {
                 ping = "@here ";
                 //YesOrNo Poll
                 if(args[2].equalsIgnoreCase("yn")){
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuilder buffer = new StringBuilder();
                     for(int i = 3; i < args.length; i++) {
-                        buffer.append(args[i] + " ");
+                        buffer.append(args[i]).append(" ");
                     }
                     event.getChannel().sendTyping().queue();
                     pollMessage = buffer.toString();
@@ -152,9 +143,9 @@ public class Commands extends ListenerAdapter {
             }if(args[1].equalsIgnoreCase("yn")){
                 ping = "";
                 //YesOrNo Poll
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuilder buffer = new StringBuilder();
                     for(int i = 2; i < args.length; i++) {
-                        buffer.append(args[i] + " ");
+                        buffer.append(args[i]).append(" ");
                     }
                     event.getChannel().sendTyping().queue();
                     pollMessage = buffer.toString();
@@ -168,18 +159,15 @@ public class Commands extends ListenerAdapter {
         //TIMEOUT
         if(args[0].equalsIgnoreCase(Main.prefix + "timeout")){
             if(args.length == 2){
-                String regex = "\\d+";
-                Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+
                 event.getChannel().sendTyping().queue();
                 String id = args[1];
-                Matcher matcher = pattern.matcher(args[1]);
+
                 id = id.replace("<@", "");
                 id = id.replace(">", "");
                 long userId = Long.parseLong(id);
                 RestAction<Member> restaction = event.getGuild().retrieveMemberById(userId);
-                restaction.queue(member -> {
-                    member.timeoutFor(1, TimeUnit.DAYS);
-                });
+                restaction.queue(member -> member.timeoutFor(1, TimeUnit.DAYS));
                 event.getChannel().sendMessage("Timeout for <@" + userId + "> has been set.").queue();
             } else {
                 event.getChannel().sendMessage("Incorrect command. Use `" + Main.prefix + "timeout @<member>`").queue();
@@ -189,7 +177,7 @@ public class Commands extends ListenerAdapter {
         if(args[0].equalsIgnoreCase(Main.prefix + "remove") && args[1].equalsIgnoreCase("timeout")){
             if(args.length == 3){
                 Member member = event.getGuild().getMemberById(args[1].replace("<@", "").replace(">",""));
-                if(member.isTimedOut()){
+                if(member != null && member.isTimedOut()){
                     member.removeTimeout();
                     event.getChannel().sendMessage("Timeout for user @" + member + " was removed.").queue();
                 }else{

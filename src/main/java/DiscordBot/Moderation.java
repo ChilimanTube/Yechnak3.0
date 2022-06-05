@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Moderation {
@@ -15,11 +14,10 @@ public class Moderation {
             try {
                 File badWords = new File("src/badwords.txt");
                 scanner = new Scanner(badWords);
-                int k = 0;
-                for(int i = 0; i < words.length; i++){
-                    for(int j = 0; scanner.hasNextLine(); j++) {
+                for (String s : words) {
+                    while (scanner.hasNextLine()) {
                         String word = scanner.nextLine();
-                        if (words[i].equalsIgnoreCase(word)) {
+                        if (s.equalsIgnoreCase(word)) {
                             result = true;
                         }
                     }
