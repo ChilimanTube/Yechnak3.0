@@ -15,23 +15,27 @@ public class Commands extends ListenerAdapter {
         String[] args = event.getMessage().getContentRaw().split(" ");
 
         //BAD WORD DETECTION
+        // It's a method that checks if the message contains a bad word.
         if (Moderation.badWordDetection(args)) {
                 event.getChannel().sendTyping().queue();
                 event.getChannel().sendMessage("Please, watch your language!").queue();
         }
 
         //PING
+        // It's a command for latency check.
         if(args[0].equalsIgnoreCase(Main.prefix + "ping")) {
             event.getChannel().sendMessage("Pong!").queue();
         }
 
         //PREFIX DISPLAY
+        // It's a command that displays the current prefix.
         if (args[0].equalsIgnoreCase(Main.prefix + "prefix")){
             event.getChannel().sendTyping().queue();
             event.getChannel().sendMessage("Ayo, my prefix is `!`").queue();
         }
 
         // COMMAND LIST
+        // It's a command that displays all commands.
         if (args[0].equalsIgnoreCase(Main.prefix + "commands")){
             event.getChannel().sendTyping().queue();
             event.getChannel().sendMessage("""
@@ -39,11 +43,14 @@ public class Commands extends ListenerAdapter {
                      `prefix` - displays current prefix\s
                      `commands` - displays all commands\s
                      `config` - settings\s
-                     ping - command for testing latency\s
-                     poll - command for creating a yes or no poll""").queue();
+                     `ping` - command for testing latency\s
+                     `timeout`- timeout a user\s
+                     `remove timeout`- remove a timeout from a user\s
+                     `poll` - command for creating a yes or no poll""").queue();
         }
 
         // CONFIGURATION SETTINGS
+        // It's a command that allows you to change the prefix of the bot.
         if (args[0].equalsIgnoreCase(Main.prefix + "config")){
             //PREFIX
             if (args.length == 2) {
@@ -66,7 +73,9 @@ public class Commands extends ListenerAdapter {
                 event.getChannel().sendMessage("Configuration commands: \n`config prefix` - prefix changing").queue();
             }
         }
-        //SUBJECTS
+
+        //SUBJECTS - WIP
+        // It's a command that allows you to add subjects to a list and then display them.
         if(args[0].equalsIgnoreCase(Main.prefix + "subjects"))  {
            if (args.length == 1) {
                if (subjects.size() >= 1) {
@@ -102,7 +111,9 @@ public class Commands extends ListenerAdapter {
                }
            }
         }
+
         // POLL
+        // It's a command that allows you to create a poll.
         if (args[0].equalsIgnoreCase(Main.prefix + "poll")) {
             String ping;
             String pollMessage;
@@ -139,7 +150,8 @@ public class Commands extends ListenerAdapter {
                         message.addReaction("❌").queue();
                     });
                 }
-            }if(args[1].equalsIgnoreCase("yn")){
+            }
+            if(args[1].equalsIgnoreCase("yn")){
                 ping = "";
                 //YesOrNo Poll
                     StringBuilder buffer = new StringBuilder();
@@ -156,6 +168,7 @@ public class Commands extends ListenerAdapter {
         }
 
         //TIMEOUT
+        // A command that allows you to timeout a user for a day.
         if(args[0].equalsIgnoreCase(Main.prefix + "timeout")){
             if(args.length == 2){
                 event.getChannel().sendTyping().queue();
@@ -172,9 +185,10 @@ public class Commands extends ListenerAdapter {
         }
 
         //REMOVE TIMEOUT
+        // Checking if the user is timeouted and if he is, it removes the timeout.
         if(args[0].equalsIgnoreCase(Main.prefix + "remove") && args[1].equalsIgnoreCase("timeout")){
             if(args.length == 3){
-                Member member = event.getGuild().getMemberById(args[1].replace("<@", "").replace(">",""));
+                Member member = event.getGuild().getMemberById(args[2].replace("<@", "").replace(">",""));
                 if(member != null && member.isTimedOut()){
                     member.removeTimeout();
                     event.getChannel().sendMessage("Timeout for user @" + member + " was removed.").queue();

@@ -8,6 +8,13 @@ import java.util.Scanner;
 
 public class Moderation {
     static Scanner scanner;
+    /**
+     * This function takes in an array of words from a message and checks if any of the words in the array match any of the strings in
+     * the badwords.txt file
+     *
+     * @param words - The words to be checked.
+     * @return A boolean value.
+     */
     public static boolean badWordDetection(String @NotNull [] words){
         boolean result = false;
         {

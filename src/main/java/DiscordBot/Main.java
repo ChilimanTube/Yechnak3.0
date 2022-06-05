@@ -9,6 +9,7 @@ public class Main {
     public static String prefix = "!";
     public static void main(String[] args)throws LoginException{
 
+        // This is the code that connects the bot to the server.
         JDA bot = JDABuilder.createDefault("OTcxMTEwNzQyMDcxODU3MTUy.GDon0y.-lmvjFFWQcdiDo7RGiKWn3mLLzUSWgfDg7Q0So")
                     .setActivity(Activity.playing("with Chili's brain"))
                     .build();
