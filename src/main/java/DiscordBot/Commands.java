@@ -3,10 +3,13 @@ package DiscordBot;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Commands extends ListenerAdapter {
     ArrayList<String> studylinks = new ArrayList<>();
@@ -14,12 +17,12 @@ public class Commands extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event){
         String[] args = event.getMessage().getContentRaw().split(" ");
 
-        for(int i = 0; i < args.length; i++) {
-            if (!Moderation.badWordDetection(args)) {
+
+            if (Moderation.badWordDetection(args)) {
                 event.getChannel().sendTyping().queue();
                 event.getChannel().sendMessage("Please, watch your language!").queue();
             }
-        }
+
         //PING
         if(args[0].equalsIgnoreCase(Main.prefix + "ping")) {
             event.getChannel().sendMessage("Pong!").queue();
@@ -165,13 +168,19 @@ public class Commands extends ListenerAdapter {
         //TIMEOUT
         if(args[0].equalsIgnoreCase(Main.prefix + "timeout")){
             if(args.length == 2){
+                String regex = "\\d+";
+                Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
                 event.getChannel().sendTyping().queue();
                 String id = args[1];
-                id.replace("<@", "").replace(">", "");
-                args[1].replace("<@", "").replace(">", "");
-                Member member = event.getGuild().getMemberById(id);
-                member.timeoutFor(1, TimeUnit.DAYS);
-                event.getChannel().sendMessage("Timeout for user @" + member + " has been set. Duration unset.").queue();
+                Matcher matcher = pattern.matcher(args[1]);
+                id = id.replace("<@", "");
+                id = id.replace(">", "");
+                long userId = Long.parseLong(id);
+                RestAction<Member> restaction = event.getGuild().retrieveMemberById(userId);
+                restaction.queue(member -> {
+                    member.timeoutFor(1, TimeUnit.DAYS);
+                });
+                event.getChannel().sendMessage("Timeout for <@" + userId + "> has been set.").queue();
             } else {
                 event.getChannel().sendMessage("Incorrect command. Use `" + Main.prefix + "timeout @<member>`").queue();
             }
