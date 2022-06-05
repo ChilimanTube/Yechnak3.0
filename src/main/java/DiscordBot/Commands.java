@@ -43,6 +43,7 @@ public class Commands extends ListenerAdapter {
                      ping - command for testing latency\s
                      poll - command for creating a yes or no poll""").queue();
         }
+
         // CONFIGURATION SETTINGS
         if (args[0].equalsIgnoreCase(Main.prefix + "config")){
             //PREFIX
@@ -66,7 +67,7 @@ public class Commands extends ListenerAdapter {
                 event.getChannel().sendMessage("Configuration commands: \n`config prefix` - prefix changing").queue();
             }
         }
-
+        //SUBJECTS
         if(args[0].equalsIgnoreCase(Main.prefix + "subjects"))  {
            if (args.length == 1) {
                if (subjects.size() >= 1) {
@@ -102,8 +103,7 @@ public class Commands extends ListenerAdapter {
                }
            }
         }
-
-        // second try poll
+        // POLL
         if (args[0].equalsIgnoreCase(Main.prefix + "poll")) {
             String ping;
             String pollMessage;
@@ -159,10 +159,8 @@ public class Commands extends ListenerAdapter {
         //TIMEOUT
         if(args[0].equalsIgnoreCase(Main.prefix + "timeout")){
             if(args.length == 2){
-
                 event.getChannel().sendTyping().queue();
                 String id = args[1];
-
                 id = id.replace("<@", "");
                 id = id.replace(">", "");
                 long userId = Long.parseLong(id);
@@ -173,6 +171,7 @@ public class Commands extends ListenerAdapter {
                 event.getChannel().sendMessage("Incorrect command. Use `" + Main.prefix + "timeout @<member>`").queue();
             }
         }
+
         //REMOVE TIMEOUT
         if(args[0].equalsIgnoreCase(Main.prefix + "remove") && args[1].equalsIgnoreCase("timeout")){
             if(args.length == 3){
